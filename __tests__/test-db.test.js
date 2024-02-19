@@ -3,6 +3,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
+const endpoints = require("../endpoints.json");
 
 beforeAll(() => seed(data));
 afterAll(() => db.end());
@@ -29,6 +30,17 @@ describe("GET /api/topics", () => {
       .expect(404)
       .then((response) => {
         expect(response.body.msg).toBe("Not Found");
+      });
+  });
+});
+
+describe("GET /api", () => {
+  test("Each API search should contain the correct keys and values", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((data) => {
+        expect(data.body).toEqual(endpoints);
       });
   });
 });
