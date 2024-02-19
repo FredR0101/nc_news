@@ -2,8 +2,6 @@ const express = require("express");
 const app = express()
 const {getTopicData, getError} = require("./controllers/controllerTopics")
 
-app.use(express.json())
-
 app.get("/api/topics", getTopicData)
 
 app.get("/api/*", getError)
