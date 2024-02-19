@@ -3,6 +3,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
+const { expect } = require("@jest/globals");
 
 beforeAll(() => seed(data));
 afterAll(() => db.end());
@@ -31,5 +32,13 @@ describe("GET /api/topics", () => {
           });
         });
       });
+  });
+  test('should return an arror if incorrect path is given to the API', () => {
+    return request(app)
+      .get("/api/tpics")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("Not Found")
+      })
   });
 });
