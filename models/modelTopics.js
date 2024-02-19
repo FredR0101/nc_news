@@ -2,9 +2,7 @@ const db = require("../db/connection");
 
 function selectTopicData() {
   return db.query(`SELECT * FROM topics`).then((result) => {
-    return {
-        topics: result
-    }
+    return result
   });
 }
 
