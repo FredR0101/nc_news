@@ -4,7 +4,7 @@ const endpoints = require("../endpoints.json");
 function getTopicData(req, res, next) {
   selectTopicData()
     .then((data) => {
-      res.status(200).send(data);
+      res.status(200).send({topics: data});
     })
     .catch(next);
 }
