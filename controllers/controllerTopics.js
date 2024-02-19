@@ -1,4 +1,4 @@
-const {selectTopicData} = require("../models/modelTopics")
+const {selectTopicData, createError} = require("../models/modelTopics")
 
 function getTopicData(req, res, next){
     selectTopicData().then((data) => {
@@ -7,6 +7,10 @@ function getTopicData(req, res, next){
     .catch(next)
 }
 
+function getError(req, res, next){
+    const error = createError()
+    res.status(error.status).send({ msg: error.msg })
+    }
 
 
-module.exports = {getTopicData}
+module.exports = {getTopicData, getError}

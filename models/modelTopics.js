@@ -12,4 +12,11 @@ function selectTopicData() {
   });
 }
 
-module.exports = {selectTopicData};
+function createError(){
+    return {
+        status: 404,
+        msg: "Not Found"
+    }
+}
+
+module.exports = {selectTopicData, createError};
