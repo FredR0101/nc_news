@@ -52,6 +52,7 @@ describe("GET /api/articles/:article_id", () => {
       .expect(200)
       .then((result) => {
         const body = result.body.article;
+        expect(body.article_id === 3);
         expect(body).toMatchObject({
           title: expect.any(String),
           topic: expect.any(String),
@@ -77,6 +78,38 @@ describe("GET /api/articles/:article_id", () => {
       .expect(404)
       .then((response) => {
         expect(response.body.msg).toBe("Article not found");
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("should return an array of all article objects, each containing the right data", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((result) => {
+        const body = result.body;
+        expect(result.body).toBeSortedBy("created_at", { descending: true });
+        body.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(String),
+          });
+        });
+      });
+  });
+  test("should return an error if wrong API path is written", () => {
+    return request(app)
+      .get("/api/artcles")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("Not Found");
       });
   });
 });

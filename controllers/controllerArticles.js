@@ -1,4 +1,4 @@
-const {retrieveArticleDataById} = require('../models/modelArticles')
+const {retrieveArticleDataById, retrieveAllArticleData} = require('../models/modelArticles')
 
 function getArticleDataById(req, res, next) {
     const { article_id } = req.params
@@ -8,4 +8,11 @@ function getArticleDataById(req, res, next) {
   .catch(next)
 }
 
-module.exports = { getArticleDataById };
+function getAllArticleData(req, res, next){
+    retrieveAllArticleData().then((result) => {
+        res.status(200).send(result)
+    })
+    .catch(next)
+}
+
+module.exports = { getArticleDataById, getAllArticleData };
