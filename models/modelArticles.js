@@ -1,4 +1,6 @@
+const { log } = require("console");
 const db = require("../db/connection");
+const comments = require("../db/data/test-data/comments");
 
 function retrieveArticleDataById(article_id) {
   return db
@@ -48,4 +50,49 @@ function retrieveAllArticleData(sort_by = "created_at", order = "DESC") {
   });
 }
 
-module.exports = { retrieveArticleDataById, retrieveAllArticleData };
+function retrieveArticleComments(
+  article_id,
+  sort_by = "created_at",
+  order = "DESC"
+) {
+  const validOrders = ["ASC", "DESC"];
+  const queryVals = [];
+
+  if (!validOrders.includes(order)) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+
+  const validSortBy = ["author", "votes", "created_at"];
+
+  if (!validSortBy.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+
+  let sqlString = `SELECT * FROM comments`;
+
+  if (article_id) {
+    sqlString += ` WHERE article_id=$1`;
+    queryVals.push(parseInt(article_id));
+  }
+
+  sqlString += ` ORDER BY ${sort_by} ${order}`;
+
+
+  return db.query(sqlString, queryVals).then((result) => {
+        const comment = result.rows;
+        if (comment.length === 0) {
+          return Promise.reject({
+            status: 404,
+            msg: "Comments not found",
+          });
+        };
+        return comment;
+      });
+  };
+
+
+module.exports = {
+  retrieveArticleDataById,
+  retrieveAllArticleData,
+  retrieveArticleComments,
+};

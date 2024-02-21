@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const endpoints = require("../endpoints.json");
+const { expect } = require("@jest/globals");
 
 beforeAll(() => seed(data));
 afterAll(() => db.end());
@@ -110,6 +111,45 @@ describe("GET /api/articles", () => {
       .expect(404)
       .then((response) => {
         expect(response.body.msg).toBe("Not Found");
+      });
+  });
+});
+
+describe("GET /api/articles/article_id/comments", () => {
+  test("should return an array of comment objects with the correct key value data, based on a specific id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((result) => {
+        const body = result.body;
+        expect(result.body).toBeSortedBy("created_at", { descending: true })
+        body.forEach((comment) => {
+          expect(comment.article_id === 1);
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("should return 400 code and correct message when passed an id that is not a number", () => {
+    return request(app)
+      .get("/api/articles/not_an_id/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("should return error code 404 and error message when passed a id that is a number but doesnt exist in the database", () => {
+    return request(app)
+      .get("/api/articles/999/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("Comments not found");
       });
   });
 });
