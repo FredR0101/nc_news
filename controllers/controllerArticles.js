@@ -1,4 +1,4 @@
-const {retrieveArticleDataById, retrieveAllArticleData} = require('../models/modelArticles')
+const {retrieveArticleDataById, retrieveAllArticleData, retrieveArticleComments} = require('../models/modelArticles')
 
 function getArticleDataById(req, res, next) {
     const { article_id } = req.params
@@ -15,4 +15,12 @@ function getAllArticleData(req, res, next){
     .catch(next)
 }
 
-module.exports = { getArticleDataById, getAllArticleData };
+function getArticleCommentsById(req, res, next){
+    const { article_id } = req.params
+    retrieveArticleComments(article_id).then((result) => {
+        res.status(200).send(result)
+    })
+    .catch(next)
+}
+
+module.exports = { getArticleDataById, getAllArticleData, getArticleCommentsById };
