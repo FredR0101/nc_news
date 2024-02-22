@@ -88,9 +88,38 @@ function insertComment(article_id, newComment) {
   }
 }
 
+function updateVotes(article_id, newVotes) {
+  if (typeof newVotes !== "number") {
+    return Promise.reject({
+      status: 400,
+      msg: "votes must be a number",
+    });
+  } else {
+    return retrieveArticleDataById(article_id).then((result) => {
+      const updatedVotes = (result.votes += newVotes);
+      if (updatedVotes < 0) {
+        return Promise.reject({
+          status: 400,
+          msg: "Votes cannot go below 0",
+        });
+      } else {
+        return db
+          .query(
+            `UPDATE articles SET votes=$1 WHERE article_id=$2 RETURNING *`,
+            [updatedVotes, article_id]
+          )
+          .then((updatedResult) => {
+            return updatedResult.rows[0];
+          });
+      }
+    });
+  }
+}
+
 module.exports = {
   retrieveArticleDataById,
   retrieveAllArticleData,
   retrieveArticleComments,
   insertComment,
+  updateVotes,
 };

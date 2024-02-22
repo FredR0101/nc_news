@@ -10,6 +10,7 @@ const {
   getAllArticleData,
   getArticleCommentsById,
   postArticleCommentById,
+  patchArticleVotes
 } = require("./controllers/controllerArticles");
 
 app.use(express.json())
@@ -25,6 +26,8 @@ app.get("/api/articles", getAllArticleData);
 app.get("/api/articles/:article_id/comments", getArticleCommentsById);
 
 app.post("/api/articles/:article_id/comments", postArticleCommentById);
+
+app.put("/api/articles/:article_id", patchArticleVotes)
 
 app.all("/api/*", getError);
 
