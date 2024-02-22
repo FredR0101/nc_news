@@ -1,6 +1,6 @@
-const { log } = require("console");
 const db = require("../db/connection");
-const comments = require("../db/data/test-data/comments");
+const { arrayCommentData, retrieveUserNames } = require("../utilFunctions");
+const users = require("../db/data/test-data/users");
 
 function retrieveArticleDataById(article_id) {
   return db
@@ -18,18 +18,6 @@ function retrieveArticleDataById(article_id) {
 }
 
 function retrieveAllArticleData(sort_by = "created_at", order = "DESC") {
-  const validOrders = ["ASC", "DESC"];
-
-  if (!validOrders.includes(order)) {
-    return Promise.reject({ status: 400, msg: "bad request" });
-  }
-
-  const validSortBy = ["author", "topic", "created_at"];
-
-  if (!validSortBy.includes(sort_by)) {
-    return Promise.reject({ status: 400, msg: "bad request" });
-  }
-
   let sqlString = `SELECT 
         articles.author,
         articles.title,
@@ -55,18 +43,7 @@ function retrieveArticleComments(
   sort_by = "created_at",
   order = "DESC"
 ) {
-  const validOrders = ["ASC", "DESC"];
   const queryVals = [];
-
-  if (!validOrders.includes(order)) {
-    return Promise.reject({ status: 400, msg: "bad request" });
-  }
-
-  const validSortBy = ["author", "votes", "created_at"];
-
-  if (!validSortBy.includes(sort_by)) {
-    return Promise.reject({ status: 400, msg: "bad request" });
-  }
 
   let sqlString = `SELECT * FROM comments`;
 
@@ -77,22 +54,43 @@ function retrieveArticleComments(
 
   sqlString += ` ORDER BY ${sort_by} ${order}`;
 
-
   return db.query(sqlString, queryVals).then((result) => {
-        const comment = result.rows;
-        if (comment.length === 0) {
-          return Promise.reject({
-            status: 404,
-            msg: "Comments not found",
-          });
-        };
-        return comment;
-      });
-  };
+    const comment = result.rows;
+    return comment;
+  });
+}
 
+function insertComment(article_id, newComment) {
+  if (Object.keys(newComment).length !== 2) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid data input",
+    });
+  } else {
+    const usernames = retrieveUserNames(users, "username");
+    const formattedComment = arrayCommentData(newComment, "author", "body");
+    if (usernames.includes(formattedComment[0])) {
+      const queryVals = [formattedComment[0], formattedComment[1]];
+      let sqlString = `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3)`;
+      if (article_id) {
+        queryVals.push(parseInt(article_id));
+        sqlString += `RETURNING *;`;
+        return db.query(sqlString, queryVals).then((result) => {
+          return result.rows[0];
+        });
+      }
+    } else {
+      return Promise.reject({
+        status: 401,
+        msg: "Invalid user",
+      });
+    }
+  }
+}
 
 module.exports = {
   retrieveArticleDataById,
   retrieveAllArticleData,
   retrieveArticleComments,
+  insertComment,
 };
