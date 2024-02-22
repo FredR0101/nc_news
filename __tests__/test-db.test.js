@@ -168,7 +168,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   test("If passed an empty field for any key, return appropriate error", () => {
     return request(app)
       .post("/api/articles/:article_id/comments")
-      .send({ author: "icellusedkars"})
+      .send({ author: "icellusedkars" })
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("Invalid data input");
@@ -177,10 +177,40 @@ describe("POST /api/articles/:article_id/comments", () => {
   test("If passed a user that doest exist on the user database, return appropriate error", () => {
     return request(app)
       .post("/api/articles/:article_id/comments")
-      .send({ author: "icellars", body: "This is a new comment"})
+      .send({ author: "icellars", body: "This is a new comment" })
       .expect(401)
       .then((response) => {
         expect(response.body.msg).toBe("Invalid user");
+      });
+  });
+});
+
+describe("PATCH /api/article/:article_id", () => {
+  test("should return the object with the correct status code and the correct amount of new votes", () => {
+    return request(app)
+      .put("/api/articles/1")
+      .send({ inc_votes: -25 })
+      .expect(200)
+      .then((response) => {
+        expect(response.body.article.votes).toBe(75);
+      });
+  });
+  test("should return the object with the correct status code and the correct amount of new votes", () => {
+    return request(app)
+      .put("/api/articles/2")
+      .send({ inc_votes: 25 })
+      .expect(200)
+      .then((response) => {
+        expect(response.body.article.votes).toBe(25);
+      });
+  });
+  test("should return correct error if votes go below 0", () => {
+    return request(app)
+      .put("/api/articles/2")
+      .send({ inc_votes: -26 })
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Votes cannot go below 0");
       });
   });
 });

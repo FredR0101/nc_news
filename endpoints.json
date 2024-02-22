@@ -69,5 +69,16 @@
       "article_id": 1,
       "created_at": 1604437200000
     }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "takes an input of a new vote count as an object, searches for an article with a specific ID, and will update the votes on the article with the amount on the new vote count object",
+    "queries": ["article_id", "newVotes"],
+    "example_response": {
+      "body": "I hate streaming noses",
+      "votes": 25,
+      "author": "icellusedkars",
+      "article_id": 1,
+      "created_at": 1604437200000
+    }
   }
 }
