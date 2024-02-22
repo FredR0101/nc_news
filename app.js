@@ -13,6 +13,7 @@ const {
   patchArticleVotes
 } = require("./controllers/controllerArticles");
 const {deleteCommentById} = require("./controllers/controllerComments")
+const {getAllUsers} = require("./controllers/controllerUsers")
 
 app.use(express.json())
 
@@ -25,6 +26,8 @@ app.get("/api/articles/:article_id", getArticleDataById);
 app.get("/api/articles", getAllArticleData);
 
 app.get("/api/articles/:article_id/comments", getArticleCommentsById);
+
+app.get("/api/users", getAllUsers)
 
 app.delete("/api/comments/:comment_id", deleteCommentById)
 
