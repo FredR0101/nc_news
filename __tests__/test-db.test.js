@@ -255,7 +255,7 @@ test("should return error code 404 and error message when passed a id that is a 
     });
 });
 
-describe.only('GET /api/users', () => {
+describe('GET /api/users', () => {
   test('should return a list of all users with the correct data', () => {
     return request(app)
       .get("/api/users")
