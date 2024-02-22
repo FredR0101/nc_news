@@ -12,6 +12,7 @@ const {
   postArticleCommentById,
   patchArticleVotes
 } = require("./controllers/controllerArticles");
+const {deleteCommentById} = require("./controllers/controllerComments")
 
 app.use(express.json())
 
@@ -24,6 +25,8 @@ app.get("/api/articles/:article_id", getArticleDataById);
 app.get("/api/articles", getAllArticleData);
 
 app.get("/api/articles/:article_id/comments", getArticleCommentsById);
+
+app.delete("/api/comments/:comment_id", deleteCommentById)
 
 app.post("/api/articles/:article_id/comments", postArticleCommentById);
 
