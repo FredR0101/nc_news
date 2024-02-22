@@ -1,4 +1,4 @@
-const {retrieveArticleDataById, retrieveAllArticleData, retrieveArticleComments} = require('../models/modelArticles')
+const {retrieveArticleDataById, retrieveAllArticleData, retrieveArticleComments, insertComment} = require('../models/modelArticles')
 
 function getArticleDataById(req, res, next) {
     const { article_id } = req.params
@@ -10,17 +10,29 @@ function getArticleDataById(req, res, next) {
 
 function getAllArticleData(req, res, next){
     retrieveAllArticleData().then((result) => {
-        res.status(200).send(result)
+        res.status(200).send({articles: result})
     })
     .catch(next)
 }
 
 function getArticleCommentsById(req, res, next){
     const { article_id } = req.params
-    retrieveArticleComments(article_id).then((result) => {
-        res.status(200).send(result)
+    const promises = [retrieveArticleComments(article_id)]
+    if(article_id){
+        promises.push(retrieveArticleDataById(article_id))
+    }
+    Promise.all(promises).then((promiseResolutions) => {
+        res.status(200).send({article: promiseResolutions[0]})
     })
     .catch(next)
 }
 
-module.exports = { getArticleDataById, getAllArticleData, getArticleCommentsById };
+function postArticleCommentById(req, res, next){
+    const {article_id} = req.params
+    insertComment(article_id, req.body).then((result) => {
+        res.status(201).send({comment: result})
+    })
+    .catch(next)
+}
+
+module.exports = { getArticleDataById, getAllArticleData, getArticleCommentsById, postArticleCommentById };

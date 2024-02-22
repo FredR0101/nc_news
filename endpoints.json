@@ -42,7 +42,7 @@
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "serves an array of all comments of a specific article_id",
+    "description": "serves an array of all comments of a specific article_id, ordered by a default of DESC on the created_at value.",
     "queries": ["article_id"],
     "example_response": [{
       "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
@@ -58,5 +58,16 @@
       "article_id": 1,
       "created_at": 1604437200000
     }]
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "takes an input of a new comment object with two key value pairs of user and body. It will search the user folder to see if the user posting in the input is a valid user, and will then post it to the comments database for that article_id given",
+    "queries": ["article_id", "new_comment"],
+    "example_response": {
+      "body": "I hate streaming noses",
+      "votes": 0,
+      "author": "icellusedkars",
+      "article_id": 1,
+      "created_at": 1604437200000
+    }
   }
 }

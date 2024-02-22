@@ -5,7 +5,14 @@ const {
   getError,
   getEndpoints,
 } = require("./controllers/controllerTopics");
-const { getArticleDataById, getAllArticleData, getArticleCommentsById } = require("./controllers/controllerArticles");
+const {
+  getArticleDataById,
+  getAllArticleData,
+  getArticleCommentsById,
+  postArticleCommentById,
+} = require("./controllers/controllerArticles");
+
+app.use(express.json())
 
 app.get("/api/topics", getTopicData);
 
@@ -13,9 +20,11 @@ app.get("/api", getEndpoints);
 
 app.get("/api/articles/:article_id", getArticleDataById);
 
-app.get("/api/articles", getAllArticleData)
+app.get("/api/articles", getAllArticleData);
 
-app.get("/api/articles/:article_id/comments", getArticleCommentsById)
+app.get("/api/articles/:article_id/comments", getArticleCommentsById);
+
+app.post("/api/articles/:article_id/comments", postArticleCommentById);
 
 app.all("/api/*", getError);
 

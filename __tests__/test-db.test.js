@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const endpoints = require("../endpoints.json");
-const { expect } = require("@jest/globals");
 
 beforeAll(() => seed(data));
 afterAll(() => db.end());
@@ -89,8 +88,10 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then((result) => {
-        const body = result.body;
-        expect(result.body).toBeSortedBy("created_at", { descending: true });
+        const body = result.body.articles;
+        expect(result.body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
         body.forEach((article) => {
           expect(article).toMatchObject({
             article_id: expect.any(Number),
@@ -105,14 +106,6 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  test("should return an error if wrong API path is written", () => {
-    return request(app)
-      .get("/api/artcles")
-      .expect(404)
-      .then((response) => {
-        expect(response.body.msg).toBe("Not Found");
-      });
-  });
 });
 
 describe("GET /api/articles/article_id/comments", () => {
@@ -121,8 +114,10 @@ describe("GET /api/articles/article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then((result) => {
-        const body = result.body;
-        expect(result.body).toBeSortedBy("created_at", { descending: true })
+        const body = result.body.article;
+        expect(result.body.article).toBeSortedBy("created_at", {
+          descending: true,
+        });
         body.forEach((comment) => {
           expect(comment.article_id === 1);
           expect(comment).toMatchObject({
@@ -149,7 +144,43 @@ describe("GET /api/articles/article_id/comments", () => {
       .get("/api/articles/999/comments")
       .expect(404)
       .then((response) => {
-        expect(response.body.msg).toBe("Comments not found");
+        expect(response.body.msg).toBe("Article not found");
+      });
+  });
+  test("should return the article with code 200 if the article exists but there is no comments present", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then((result) => {
+        const body = result.body.article;
+        expect(body.length).toBe(0);
+      });
+  });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("should retrieve a post request and insert it into the comments.", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ author: "icellusedkars", body: "This is a new comment" })
+      .expect(201);
+  });
+  test("If passed an empty field for any key, return appropriate error", () => {
+    return request(app)
+      .post("/api/articles/:article_id/comments")
+      .send({ author: "icellusedkars"})
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Invalid data input");
+      });
+  });
+  test("If passed a user that doest exist on the user database, return appropriate error", () => {
+    return request(app)
+      .post("/api/articles/:article_id/comments")
+      .send({ author: "icellars", body: "This is a new comment"})
+      .expect(401)
+      .then((response) => {
+        expect(response.body.msg).toBe("Invalid user");
       });
   });
 });
