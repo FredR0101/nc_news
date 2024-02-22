@@ -80,5 +80,10 @@
       "article_id": 1,
       "created_at": 1604437200000
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "takes an input of a comment ID and will delete the comment with the same ID if present in the database",
+    "queries": [],
+    "example_response": {}
   }
 }

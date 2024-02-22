@@ -167,7 +167,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
   test("If passed an empty field for any key, return appropriate error", () => {
     return request(app)
-      .post("/api/articles/:article_id/comments")
+      .post("/api/articles/1/comments")
       .send({ author: "icellusedkars" })
       .expect(400)
       .then((response) => {
@@ -176,7 +176,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
   test("If passed a user that doest exist on the user database, return appropriate error", () => {
     return request(app)
-      .post("/api/articles/:article_id/comments")
+      .post("/api/articles/1/comments")
       .send({ author: "icellars", body: "This is a new comment" })
       .expect(401)
       .then((response) => {
@@ -213,4 +213,44 @@ describe("PATCH /api/article/:article_id", () => {
         expect(response.body.msg).toBe("Votes cannot go below 0");
       });
   });
+  test("should return correct error if id passed in is not a number", () => {
+    return request(app)
+      .put("/api/articles/not_a_number")
+      .send({ inc_votes: -26 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("should return error code 404 and error message when passed a id that is a number but doesnt exist in the database", () => {
+    return request(app)
+      .put("/api/articles/999")
+      .send({ inc_votes: -26 })
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("Article not found");
+      });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("should delete the comment when provided the comment id, ", () => {
+    return request(app).delete("/api/comments/3").expect(204);
+  });
+});
+test("should return correct error if id passed in is not a number", () => {
+  return request(app)
+    .delete("/api/comments/not_a_number")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Bad Request");
+    });
+});
+test("should return error code 404 and error message when passed a id that is a number but doesnt exist in the database", () => {
+  return request(app)
+    .delete("/api/comments/999")
+    .expect(404)
+    .then((response) => {
+      expect(response.body.msg).toBe("Comment not found");
+    });
 });
