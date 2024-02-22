@@ -254,3 +254,21 @@ test("should return error code 404 and error message when passed a id that is a 
       expect(response.body.msg).toBe("Comment not found");
     });
 });
+
+describe('GET /api/users', () => {
+  test('should return a list of all users with the correct data', () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((result) => {
+        const body = result.body.users
+        body.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String)
+          })
+        })
+      })
+  });
+});
