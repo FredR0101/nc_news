@@ -89,7 +89,7 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then((result) => {
         const body = result.body.articles;
-        expect(result.body.articles).toBeSortedBy("created_at", {
+        expect(body).toBeSortedBy("created_at", {
           descending: true,
         });
         body.forEach((article) => {
@@ -255,20 +255,41 @@ test("should return error code 404 and error message when passed a id that is a 
     });
 });
 
-describe('GET /api/users', () => {
-  test('should return a list of all users with the correct data', () => {
+describe("GET /api/users", () => {
+  test("should return a list of all users with the correct data", () => {
     return request(app)
       .get("/api/users")
       .expect(200)
       .then((result) => {
-        const body = result.body.users
+        const body = result.body.users;
         body.forEach((user) => {
           expect(user).toMatchObject({
             username: expect.any(String),
             name: expect.any(String),
-            avatar_url: expect.any(String)
-          })
-        })
-      })
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+});
+
+describe("GET /api/articles(topicQuery)", () => {
+  test("accept a topic query and return the correct status with only the data related to the specified query", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.articles.length).toBe(1)
+        expect(result.body.articles).toBeSortedBy("cats");
+      });
+  });
+  test("Should return an error if passed a query that is not accepted in the topic variables", () => {
+    return request(app)
+      .get("/api/articles?topic=dogs")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("bad request");
+      });
   });
 });
