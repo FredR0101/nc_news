@@ -13,29 +13,49 @@ function retrieveArticleDataById(article_id) {
           msg: "Article not found",
         });
       }
-      return article;
+      articleData = article;
+      return db.query(
+        `SELECT COUNT(*) AS comment_count FROM comments WHERE article_id=$1`,
+        [article_id]
+      );
+    })
+    .then((commentResult) => {
+      const commentCount = commentResult.rows[0].comment_count;
+      articleData.comment_count = commentCount;
+      return articleData;
     });
 }
 
-function retrieveAllArticleData(sort_by = "created_at", order = "DESC") {
-  let sqlString = `SELECT 
-        articles.author,
-        articles.title,
-        articles.article_id,
-        articles.topic,
-        articles.created_at,
-        articles.votes,
-        articles.article_img_url,
-        COUNT(comments.comment_id) AS comment_count
-        FROM articles
-        LEFT JOIN comments ON articles.article_id = comments.article_id
-        GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url`;
+function retrieveAllArticleData(topic, sort_by = "created_at", order = "DESC") {
+  const validTopics = ["mitch", "cats"];
+  if (topic && !validTopics.includes(topic)) {
+    return Promise.reject({ status: 404, msg: "Not found" });
+  } else {
+    const queryVals = [];
+    let sqlString = `SELECT 
+          articles.author,
+          articles.title,
+          articles.article_id,
+          articles.topic,
+          articles.created_at,
+          articles.votes,
+          articles.article_img_url,
+          COUNT(comments.comment_id) AS comment_count
+          FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`;
 
-  sqlString += ` ORDER BY ${sort_by} ${order}`;
+    if (topic) {
+      queryVals.push(topic);
+      sqlString += ` WHERE topic=$1`;
+    }
 
-  return db.query(sqlString).then((result) => {
-    return result.rows;
-  });
+    sqlString += ` GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url`;
+
+    sqlString += ` ORDER BY ${sort_by} ${order}`;
+
+    return db.query(sqlString, queryVals).then((result) => {
+      return result.rows;
+    });
+  }
 }
 
 function retrieveArticleComments(
