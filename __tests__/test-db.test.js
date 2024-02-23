@@ -273,7 +273,7 @@ describe("GET /api/users", () => {
   });
 });
 
-describe.only("GET /api/articles(topicQuery)", () => {
+describe("GET /api/articles(topicQuery)", () => {
   test("accept a topic query and return the correct status with only the data related to the specified query", () => {
     return request(app)
       .get("/api/articles?topic=cats")
