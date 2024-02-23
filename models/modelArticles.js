@@ -13,14 +13,23 @@ function retrieveArticleDataById(article_id) {
           msg: "Article not found",
         });
       }
-      return article;
+      articleData = article;
+      return db.query(
+        `SELECT COUNT(*) AS comment_count FROM comments WHERE article_id=$1`,
+        [article_id]
+      );
+    })
+    .then((commentResult) => {
+      const commentCount = commentResult.rows[0].comment_count;
+      articleData.comment_count = commentCount;
+      return articleData;
     });
 }
 
 function retrieveAllArticleData(topic, sort_by = "created_at", order = "DESC") {
   const validTopics = ["mitch", "cats"];
   if (topic && !validTopics.includes(topic)) {
-    return Promise.reject({ status: 400, msg: "bad request" });
+    return Promise.reject({ status: 404, msg: "Not found" });
   } else {
     const queryVals = [];
     let sqlString = `SELECT 
