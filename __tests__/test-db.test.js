@@ -292,6 +292,15 @@ describe("GET /api/articles(topicQuery)", () => {
         expect(error.msg).toBe("Not found");
       });
   });
+  test('should return an empty array if passed a topic that has no articles connected to it', () => {
+    return request(app)
+    .get("/api/articles?topic=paper")
+    .expect(200)
+    .then((result) => {
+      expect(result.body.articles.length).toBe(0);
+      expect(result.body.articles).toBeSortedBy("paper")
+    });
+  });
 });
 
 describe("GET /api/articles/:article_id(comment_count)", () => {
