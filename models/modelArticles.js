@@ -27,7 +27,7 @@ function retrieveArticleDataById(article_id) {
 }
 
 function retrieveAllArticleData(topic, sort_by = "created_at", order = "DESC") {
-  const validTopics = ["mitch", "cats"];
+  const validTopics = ["mitch", "cats", "paper"];
   if (topic && !validTopics.includes(topic)) {
     return Promise.reject({ status: 404, msg: "Not found" });
   } else {

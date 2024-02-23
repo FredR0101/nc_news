@@ -273,7 +273,7 @@ describe("GET /api/users", () => {
   });
 });
 
-describe("GET /api/articles(topicQuery)", () => {
+describe.only("GET /api/articles(topicQuery)", () => {
   test("accept a topic query and return the correct status with only the data related to the specified query", () => {
     return request(app)
       .get("/api/articles?topic=cats")
@@ -291,6 +291,15 @@ describe("GET /api/articles(topicQuery)", () => {
         const error = response.body;
         expect(error.msg).toBe("Not found");
       });
+  });
+  test('should return an empty array if passed a topic that has no articles connected to it', () => {
+    return request(app)
+    .get("/api/articles?topic=paper")
+    .expect(200)
+    .then((result) => {
+      expect(result.body.articles.length).toBe(0);
+      expect(result.body.articles).toBeSortedBy("paper")
+    });
   });
 });
 
