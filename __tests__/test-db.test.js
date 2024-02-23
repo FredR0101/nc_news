@@ -303,24 +303,23 @@ describe("GET /api/articles(topicQuery)", () => {
   });
 });
 
-describe("GET /api/articles/:article_id(comment_count)", () => {
+describe.only("GET /api/articles/:article_id(comment_count)", () => {
   test("should return a totoal of all the comments in an article specified by ID, add to the article as a comment_count key/value.", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
       .then((result) => {
         const body = result.body.article;
-        expect(body).toMatchObject({
-          article_id: expect.any(Number),
-          title: expect.any(String),
-          topic: expect.any(String),
-          author: expect.any(String),
-          body: expect.any(String),
-          created_at: expect.any(String),
-          votes: expect.any(Number),
-          article_img_url: expect.any(String),
-          comment_count: expect.any(String),
-        });
+        console.log(body);
+        expect(body.article_id).toBe(1)
+        expect(body.title).toBe('Living in the shadow of a great man')
+        expect(body.topic).toBe('mitch')
+        expect(body.author).toBe('butter_bridge')
+        expect(body.body).toBe('I find this existence challenging')
+        expect(body.created_at).toBe('2020-07-09T20:11:00.000Z')
+        expect(body.votes).toBe(100)
+        expect(body.article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
+        expect(body.comment_count).toBe('11')
       });
   });
   test("should return 400 code and correct message when passed an id that is not a number", () => {

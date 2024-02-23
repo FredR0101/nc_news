@@ -1,6 +1,7 @@
 const db = require("../db/connection");
 const { arrayCommentData, retrieveUserNames } = require("../utilFunctions");
 const users = require("../db/data/test-data/users");
+const { selectTopicData } = require("./modelTopics");
 
 function retrieveArticleDataById(article_id) {
   return db
@@ -27,35 +28,40 @@ function retrieveArticleDataById(article_id) {
 }
 
 function retrieveAllArticleData(topic, sort_by = "created_at", order = "DESC") {
-  const validTopics = ["mitch", "cats", "paper"];
-  if (topic && !validTopics.includes(topic)) {
-    return Promise.reject({ status: 404, msg: "Not found" });
-  } else {
-    const queryVals = [];
-    let sqlString = `SELECT 
-          articles.author,
-          articles.title,
-          articles.article_id,
-          articles.topic,
-          articles.created_at,
-          articles.votes,
-          articles.article_img_url,
-          COUNT(comments.comment_id) AS comment_count
-          FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`;
+  return selectTopicData()
+    .then((result) => {
+      return retrieveUserNames(result.rows, "slug");
+    })
+    .then((searchTopicsResult) => {
+      const topicsArray = searchTopicsResult;
+      const validTopics = topicsArray;
+      if (topic && !validTopics.includes(topic)) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      } else {
+        const queryVals = [];
+        let sqlString = `SELECT 
+              articles.author,
+              articles.title,
+              articles.article_id,
+              articles.topic,
+              articles.created_at,
+              articles.votes,
+              articles.article_img_url,
+              COUNT(comments.comment_id) AS comment_count
+              FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`;
 
-    if (topic) {
-      queryVals.push(topic);
-      sqlString += ` WHERE topic=$1`;
-    }
+        if (topic) {
+          queryVals.push(topic);
+          sqlString += ` WHERE topic=$1`;
+        }
 
-    sqlString += ` GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url`;
+        sqlString += ` GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url  ORDER BY ${sort_by} ${order}`;
 
-    sqlString += ` ORDER BY ${sort_by} ${order}`;
-
-    return db.query(sqlString, queryVals).then((result) => {
-      return result.rows;
+        return db.query(sqlString, queryVals).then((result) => {
+          return result.rows;
+        });
+      }
     });
-  }
 }
 
 function retrieveArticleComments(
