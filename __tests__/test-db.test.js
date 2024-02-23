@@ -310,7 +310,6 @@ describe("GET /api/articles/:article_id(comment_count)", () => {
       .expect(200)
       .then((result) => {
         const body = result.body.article;
-        console.log(body);
         expect(body.article_id).toBe(1)
         expect(body.title).toBe('Living in the shadow of a great man')
         expect(body.topic).toBe('mitch')
