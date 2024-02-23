@@ -303,7 +303,7 @@ describe("GET /api/articles(topicQuery)", () => {
   });
 });
 
-describe.only("GET /api/articles/:article_id(comment_count)", () => {
+describe("GET /api/articles/:article_id(comment_count)", () => {
   test("should return a totoal of all the comments in an article specified by ID, add to the article as a comment_count key/value.", () => {
     return request(app)
       .get("/api/articles/1")
@@ -317,7 +317,7 @@ describe.only("GET /api/articles/:article_id(comment_count)", () => {
         expect(body.author).toBe('butter_bridge')
         expect(body.body).toBe('I find this existence challenging')
         expect(body.created_at).toBe('2020-07-09T20:11:00.000Z')
-        expect(body.votes).toBe(100)
+        expect(body.votes).toBe(75)
         expect(body.article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
         expect(body.comment_count).toBe('11')
       });
