@@ -9,8 +9,8 @@ function getArticleDataById(req, res, next) {
 }
 
 function getAllArticleData(req, res, next){
-    const {topic} = req.query
-    retrieveAllArticleData(topic).then((result) => {
+    const {topic, sort_by, order} = req.query
+    retrieveAllArticleData(topic, sort_by, order).then((result) => {
         res.status(200).send({articles: result})
     })
     .catch(next)

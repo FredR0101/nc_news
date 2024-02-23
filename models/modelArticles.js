@@ -28,6 +28,8 @@ function retrieveArticleDataById(article_id) {
 }
 
 function retrieveAllArticleData(topic, sort_by = "created_at", order = "DESC") {
+  const validOrders = ["ASC", "DESC"];
+  const validSortBy = ["author", "created_at"];
   return selectTopicData()
     .then((result) => {
       return retrieveUserNames(result.rows, "slug");
@@ -38,17 +40,23 @@ function retrieveAllArticleData(topic, sort_by = "created_at", order = "DESC") {
       if (topic && !validTopics.includes(topic)) {
         return Promise.reject({ status: 404, msg: "Not found" });
       } else {
+        if (order && !validOrders.includes(order)) {
+          return Promise.reject({ status: 404, msg: "Not found" });
+        }
+        if (sort_by && !validSortBy.includes(sort_by)) {
+          return Promise.reject({ status: 404, msg: "Not found" });
+        }
         const queryVals = [];
         let sqlString = `SELECT 
-              articles.author,
-              articles.title,
-              articles.article_id,
-              articles.topic,
-              articles.created_at,
-              articles.votes,
-              articles.article_img_url,
-              COUNT(comments.comment_id) AS comment_count
-              FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`;
+                articles.author,
+                articles.title,
+                articles.article_id,
+                articles.topic,
+                articles.created_at,
+                articles.votes,
+                articles.article_img_url,
+                COUNT(comments.comment_id) AS comment_count
+                FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`;
 
         if (topic) {
           queryVals.push(topic);
@@ -56,7 +64,6 @@ function retrieveAllArticleData(topic, sort_by = "created_at", order = "DESC") {
         }
 
         sqlString += ` GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url  ORDER BY ${sort_by} ${order}`;
-
         return db.query(sqlString, queryVals).then((result) => {
           return result.rows;
         });

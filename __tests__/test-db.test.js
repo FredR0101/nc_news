@@ -292,14 +292,14 @@ describe("GET /api/articles(topicQuery)", () => {
         expect(error.msg).toBe("Not found");
       });
   });
-  test('should return an empty array if passed a topic that has no articles connected to it', () => {
+  test("should return an empty array if passed a topic that has no articles connected to it", () => {
     return request(app)
-    .get("/api/articles?topic=paper")
-    .expect(200)
-    .then((result) => {
-      expect(result.body.articles.length).toBe(0);
-      expect(result.body.articles).toBeSortedBy("paper")
-    });
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.articles.length).toBe(0);
+        expect(result.body.articles).toBeSortedBy("paper");
+      });
   });
 });
 
@@ -310,15 +310,17 @@ describe("GET /api/articles/:article_id(comment_count)", () => {
       .expect(200)
       .then((result) => {
         const body = result.body.article;
-        expect(body.article_id).toBe(1)
-        expect(body.title).toBe('Living in the shadow of a great man')
-        expect(body.topic).toBe('mitch')
-        expect(body.author).toBe('butter_bridge')
-        expect(body.body).toBe('I find this existence challenging')
-        expect(body.created_at).toBe('2020-07-09T20:11:00.000Z')
-        expect(body.votes).toBe(75)
-        expect(body.article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
-        expect(body.comment_count).toBe('11')
+        expect(body.article_id).toBe(1);
+        expect(body.title).toBe("Living in the shadow of a great man");
+        expect(body.topic).toBe("mitch");
+        expect(body.author).toBe("butter_bridge");
+        expect(body.body).toBe("I find this existence challenging");
+        expect(body.created_at).toBe("2020-07-09T20:11:00.000Z");
+        expect(body.votes).toBe(75);
+        expect(body.article_img_url).toBe(
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        );
+        expect(body.comment_count).toBe("11");
       });
   });
   test("should return 400 code and correct message when passed an id that is not a number", () => {
@@ -335,6 +337,37 @@ describe("GET /api/articles/:article_id(comment_count)", () => {
       .expect(404)
       .then((response) => {
         expect(response.body.msg).toBe("Article not found");
+      });
+  });
+});
+
+describe("GET /api/articles(sorting query)", () => {
+  test("accept a sort_by and order query and return the correct status with only the data related to the specified query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author&order=ASC")
+      .expect(200)
+      .then((result) => {
+        expect(result.body.articles).toBeSortedBy("author", {
+          ascending: true,
+        });
+      });
+  });
+  test("Should return an error if passed a query that is not accepted in the sort_by variables", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=ASC")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Not found");
+      });
+  });
+  test("Should return an error if passed a query that is not accepted in the order variables", () => {
+    return request(app)
+      .get("/api/articles?sort_by=created_at&order=diagonal")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Not found");
       });
   });
 });
