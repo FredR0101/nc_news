@@ -36,7 +36,7 @@ app.delete("/api/comments/:comment_id", deleteCommentById)
 
 app.post("/api/articles/:article_id/comments", postArticleCommentById);
 
-app.put("/api/articles/:article_id", patchArticleVotes)
+app.patch("/api/articles/:article_id", patchArticleVotes)
 
 app.all("/api/*", getError);
 

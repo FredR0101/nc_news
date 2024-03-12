@@ -188,7 +188,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 describe("PATCH /api/article/:article_id", () => {
   test("should return the object with the correct status code and the correct amount of new votes", () => {
     return request(app)
-      .put("/api/articles/1")
+      .patch("/api/articles/1")
       .send({ inc_votes: -25 })
       .expect(200)
       .then((response) => {
@@ -197,7 +197,7 @@ describe("PATCH /api/article/:article_id", () => {
   });
   test("should return the object with the correct status code and the correct amount of new votes", () => {
     return request(app)
-      .put("/api/articles/2")
+      .patch("/api/articles/2")
       .send({ inc_votes: 25 })
       .expect(200)
       .then((response) => {
@@ -206,7 +206,7 @@ describe("PATCH /api/article/:article_id", () => {
   });
   test("should return correct error if votes go below 0", () => {
     return request(app)
-      .put("/api/articles/2")
+      .patch("/api/articles/2")
       .send({ inc_votes: -26 })
       .expect(400)
       .then((response) => {
@@ -215,7 +215,7 @@ describe("PATCH /api/article/:article_id", () => {
   });
   test("should return correct error if id passed in is not a number", () => {
     return request(app)
-      .put("/api/articles/not_a_number")
+      .patch("/api/articles/not_a_number")
       .send({ inc_votes: -26 })
       .expect(400)
       .then(({ body }) => {
@@ -224,7 +224,7 @@ describe("PATCH /api/article/:article_id", () => {
   });
   test("should return error code 404 and error message when passed a id that is a number but doesnt exist in the database", () => {
     return request(app)
-      .put("/api/articles/999")
+      .patch("/api/articles/999")
       .send({ inc_votes: -26 })
       .expect(404)
       .then((response) => {
