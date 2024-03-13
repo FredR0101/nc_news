@@ -2,6 +2,7 @@ const db = require("../db/connection");
 const { arrayCommentData, retrieveUserNames } = require("../utilFunctions");
 const users = require("../db/data/test-data/users");
 const { selectTopicData } = require("./modelTopics");
+const { retrieveAllUserData } = require("./modelUsers");
 
 function retrieveArticleDataById(article_id) {
   return db
@@ -100,22 +101,14 @@ function insertComment(article_id, newComment) {
       msg: "Invalid data input",
     });
   } else {
-    const usernames = retrieveUserNames(users, "username");
     const formattedComment = arrayCommentData(newComment, "author", "body");
-    if (usernames.includes(formattedComment[0])) {
-      const queryVals = [formattedComment[0], formattedComment[1]];
-      let sqlString = `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3)`;
-      if (article_id) {
-        queryVals.push(parseInt(article_id));
-        sqlString += `RETURNING *;`;
-        return db.query(sqlString, queryVals).then((result) => {
-          return result.rows[0];
-        });
-      }
-    } else {
-      return Promise.reject({
-        status: 401,
-        msg: "Invalid user",
+    const queryVals = [formattedComment[0], formattedComment[1]];
+    let sqlString = `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3)`;
+    if (article_id) {
+      queryVals.push(parseInt(article_id));
+      sqlString += `RETURNING *;`;
+      return db.query(sqlString, queryVals).then((result) => {
+        return result.rows[0];
       });
     }
   }

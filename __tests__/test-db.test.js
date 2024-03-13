@@ -178,9 +178,9 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({ author: "icellars", body: "This is a new comment" })
-      .expect(401)
+      .expect(404)
       .then((response) => {
-        expect(response.body.msg).toBe("Invalid user");
+        expect(response.body.msg).toBe("Not Found");
       });
   });
 });
