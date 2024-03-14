@@ -30,7 +30,7 @@ function retrieveArticleDataById(article_id) {
 
 function retrieveAllArticleData(topic, sort_by = "created_at", order = "DESC") {
   const validOrders = ["ASC", "DESC"];
-  const validSortBy = ["author", "created_at"];
+  const validSortBy = ["author", "created_at", "votes", "comment_count"];
   return selectTopicData()
     .then((result) => {
       return retrieveUserNames(result.rows, "slug");
